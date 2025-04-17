@@ -1,26 +1,33 @@
 name: Run Bot
 
 on:
-  workflow_dispatch:  # You can manually run this from the GitHub Actions tab
+  workflow_dispatch:  # Allows you to manually trigger the workflow
 
 jobs:
   run-bot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use the latest version of Ubuntu
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Checkout the repository
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # Step 1: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Use the setup-node action
         with:
-          python-version: '3.10'
+          node-version: '14'  # Specify the Node.js version you are using (adjust as needed)
 
+      # Step 2: Install Dependencies
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          npm install  # Install dependencies from your package.json file
 
+      # Step 3: Run the Bot
       - name: Run the Bot
-        run: python main.py  # Change to your actual bot entry file
-
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}  # Add your environment variable here
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+        run: |
+          node your-bot-file.js  # Replace 'your-bot-file.js' with the name of your bot entry file
