@@ -1,0 +1,15 @@
+
+{
+  "name": "driveup-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot to copy Google Drive folders",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "googleapis": "^132.0.0",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}
