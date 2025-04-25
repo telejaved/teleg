@@ -1,17 +1,25 @@
-
 const TelegramBot = require('node-telegram-bot-api');
 const { google } = require("googleapis");
 require('dotenv').config();
 
+// Environment Variables
 const TOKEN = process.env.TELEGRAM_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
+const APP_URL = process.env.APP_URL; // Add APP_URL in Heroku Config Vars
 
-const bot = new TelegramBot(TOKEN, { polling: true });
+// Initialize the bot with webhook
+const bot = new TelegramBot(TOKEN, { webHook: true });
+const PORT = process.env.PORT || 3000;
 
+// Set the webhook
+bot.setWebHook(`${APP_URL}/bot${TOKEN}`);
+
+// User data store
 const userData = {};
 
+// Helper Functions
 function extractFileId(url) {
   const match = url.match(/\/folders\/([a-zA-Z0-9_-]+)/);
   return match ? match[1] : null;
@@ -89,6 +97,7 @@ async function copyFolderContents(drive, srcId, destId, progressCallback) {
   return processed;
 }
 
+// Telegram Bot Handlers
 bot.onText(/\/driveup/, async (msg) => {
   const chatId = msg.chat.id;
   const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
@@ -153,4 +162,12 @@ bot.on('message', async (msg) => {
       bot.sendMessage(chatId, "❌ Copy failed.");
     }
   }
+});
+
+// Start the webhook server
+bot.startWebHook({
+  port: PORT,
+  webhookCallback: (req, res) => {
+    res.status(200).send("OK");
+  },
 });
